@@ -22,11 +22,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
+
+    ArrayList<String> posterPaths = new ArrayList<String>();
+    GridView gridView;
 
     public MainActivityFragment() {
     }
@@ -37,8 +41,8 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
 
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridview);
-        gridView.setAdapter(new ImageAdapter(getActivity(), mThumbIds));
+        gridView = (GridView) rootView.findViewById(R.id.gridview);
+        new FetchMovieTask().execute();
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -46,13 +50,8 @@ public class MainActivityFragment extends Fragment {
                 Toast.makeText(getContext(), "" + position, Toast.LENGTH_SHORT).show();
             }
         });
-        return rootView;
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        new FetchMovieTask().execute();
+        return rootView;
     }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, JSONArray> {
@@ -61,6 +60,7 @@ public class MainActivityFragment extends Fragment {
         final String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
         final String SORT_PARAM = "sort_by";
         final String API_PARAM = "api_key";
+        final String TAG_POSTER_PATH = "poster_path";
 
         @Override
         protected JSONArray doInBackground(Void... nothing) {
@@ -174,22 +174,24 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(JSONArray movieArray) {
             super.onPostExecute(movieArray);
-            // TODO: Load images on to the GridView
+
+            // now we need to send the poster paths to the ImageAdapter
+            // for it to load images on to the GridView
+
+            for (int i = 0; i < movieArray.length(); i++) {
+                try {
+                    posterPaths.add(movieArray.getJSONObject(i).getString(TAG_POSTER_PATH));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // now we have all the poster paths ready
+            // just send it to ImageAdapter as a parameter
+
+            if (posterPaths != null) {
+                gridView.setAdapter(new ImageAdapter(getActivity(), posterPaths));
+            }
         }
     }
-
-    // references to our images
-
-    private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-    };
 }
