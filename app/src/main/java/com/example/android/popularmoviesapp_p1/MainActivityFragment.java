@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp_p1;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
     ArrayList<String> posterPaths = new ArrayList<String>();
+    JSONArray movieArray = null;
     GridView gridView;
 
     public MainActivityFragment() {
@@ -47,7 +48,17 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "" + position, Toast.LENGTH_SHORT).show();
+                if (movieArray != null) {
+                    // get the movie details
+                    try {
+                        String movieDetails = movieArray.getJSONObject(position).toString();
+                        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetail.class);
+                        movieDetailsIntent.putExtra(Intent.EXTRA_TEXT, movieDetails);
+                        startActivity(movieDetailsIntent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -160,7 +171,7 @@ public class MainActivityFragment extends Fragment {
             final String MOVIE_LIST = "results";
 
             JSONObject movieJSON = new JSONObject(movieJSONStr);
-            JSONArray movieArray = movieJSON.getJSONArray(MOVIE_LIST);
+            movieArray = movieJSON.getJSONArray(MOVIE_LIST);
 
             /*for (int i = 0; i < movieArray.length(); i++) {
                 JSONObject movieDetails = movieArray.getJSONObject(i);
