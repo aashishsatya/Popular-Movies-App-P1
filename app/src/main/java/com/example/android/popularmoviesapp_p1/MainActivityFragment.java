@@ -1,12 +1,15 @@
 package com.example.android.popularmoviesapp_p1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,9 +32,20 @@ import java.util.ArrayList;
  */
 public class MainActivityFragment extends Fragment {
 
+    final String TAG_SORT_ON_POPULARITY = "popularity.desc";
+    final String TAG_SORT_ON_RATINGS = "vote_average.desc";
     ArrayList<String> posterPaths = new ArrayList<String>();
     JSONArray movieArray = null;
     GridView gridView;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public MainActivityFragment() {
     }
@@ -83,6 +97,19 @@ public class MainActivityFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String movieJSONStr = null;
             int numMovies = 20;
+            String sortingOrder = null;
+
+            // find the sorting parameter 
+            // get user's preferred units setting
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortingOrderPref = sharedPref.getString(getString(R.string.sort_order_key),
+                    getString(R.string.sort_order_default));
+            if (sortingOrderPref.equals(getString(R.string.sort_order_rating))) {
+                sortingOrder = TAG_SORT_ON_RATINGS;
+            }
+            else {
+                sortingOrder = TAG_SORT_ON_POPULARITY;
+            }
 
             try {
                 // Construct the URL for the MovieDB query
@@ -93,7 +120,7 @@ public class MainActivityFragment extends Fragment {
 
                 Uri builtUri = Uri.parse(MOVIE_BASE_URL)
                         .buildUpon()
-                        .appendQueryParameter(SORT_PARAM, "popularity.desc")
+                        .appendQueryParameter(SORT_PARAM, sortingOrder)
                         .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
                         .build();
 
