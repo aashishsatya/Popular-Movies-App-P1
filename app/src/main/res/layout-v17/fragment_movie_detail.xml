@@ -78,7 +78,8 @@
                 android:text="Medium Text"
                 android:id="@+id/ratings_textView"
                 android:layout_weight="0.5"
-                android:layout_gravity="right" />
+                android:layout_gravity="right"
+                android:textAlignment="viewEnd" />
 
         </LinearLayout>
     </RelativeLayout>

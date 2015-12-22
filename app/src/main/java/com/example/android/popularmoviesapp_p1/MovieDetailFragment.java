@@ -57,8 +57,8 @@ public class MovieDetailFragment extends Fragment {
 
                 title_textView.setText(movieDetailsJSON.getString(TAG_ORIGINAL_TITLE));
                 synopsis_textView.setText(movieDetailsJSON.getString(TAG_SYNOPSIS));
-                year_textView.setText(movieDetailsJSON.getString(TAG_RELEASE_DATE));
-                ratings_textView.setText(movieDetailsJSON.getString(TAG_RATINGS));
+                year_textView.setText("Release Date: " + movieDetailsJSON.getString(TAG_RELEASE_DATE));
+                ratings_textView.setText("Ratings: " + movieDetailsJSON.getString(TAG_RATINGS));
 
                 // use Picasso to load up the Image View
                 Picasso.with(getContext()).load(IMAGE_BASE_URL + movieDetailsJSON.getString(TAG_POSTER_PATH)).into(poster_imageView);

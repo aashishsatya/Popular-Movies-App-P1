@@ -49,7 +49,7 @@ public class ImageAdapter extends BaseAdapter {
             // each "w185" image is 185 x 277
             // but this size is too small on a screen
             // so double it
-            imageView.setLayoutParams(new GridView.LayoutParams(370, 554));
+            imageView.setLayoutParams(new GridView.LayoutParams(388, 581));
             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
             imageView.setPadding(0, 0, 0, 0);
         }

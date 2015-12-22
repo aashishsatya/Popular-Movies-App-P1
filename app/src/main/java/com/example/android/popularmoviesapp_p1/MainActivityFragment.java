@@ -63,7 +63,6 @@ public class MainActivityFragment extends Fragment {
 
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
-        new FetchMovieTask().execute();
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -84,6 +83,12 @@ public class MainActivityFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        new FetchMovieTask().execute();
     }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, JSONArray> {
