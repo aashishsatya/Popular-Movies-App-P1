@@ -19,7 +19,7 @@ import org.json.JSONObject;
  */
 public class MovieDetailFragment extends Fragment {
 
-    final String TAG_TITLE = "title";
+    final String TAG_ORIGINAL_TITLE = "original_title";
     final String TAG_RATINGS = "vote_average";
     final String TAG_RELEASE_DATE = "release_date";
     final String TAG_SYNOPSIS = "overview";
@@ -52,7 +52,7 @@ public class MovieDetailFragment extends Fragment {
 
                 // load them up
 
-                title_textView.setText(movieDetailsJSON.getString(TAG_TITLE));
+                title_textView.setText(movieDetailsJSON.getString(TAG_ORIGINAL_TITLE));
                 synopsis_textView.setText(movieDetailsJSON.getString(TAG_SYNOPSIS));
                 year_textView.setText(movieDetailsJSON.getString(TAG_RELEASE_DATE));
                 ratings_textView.setText(movieDetailsJSON.getString(TAG_RATINGS));
