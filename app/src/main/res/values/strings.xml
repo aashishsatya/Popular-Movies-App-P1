@@ -7,7 +7,7 @@
 
     <!-- Strings related to Settings -->
 
-    <!-- Example General settings -->
+    <!-- General settings -->
     <string name="pref_header_general">General</string>
 
     <string name="pref_title_sort_order">Sort Order</string>
@@ -23,6 +23,9 @@
         <item>@string/sort_order_popularity</item>
         <item>@string/sort_order_rating</item>
     </string-array>
+
+    <!-- the rest of the code has been created by the template and have been left as it is for
+    reference or future use -->
 
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact
