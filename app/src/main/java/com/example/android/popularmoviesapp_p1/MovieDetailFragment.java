@@ -19,12 +19,15 @@ import org.json.JSONObject;
  */
 public class MovieDetailFragment extends Fragment {
 
+    // strings for manipulating the JSON object received as extra
+
     final String TAG_ORIGINAL_TITLE = "original_title";
     final String TAG_RATINGS = "vote_average";
     final String TAG_RELEASE_DATE = "release_date";
     final String TAG_SYNOPSIS = "overview";
     final String TAG_POSTER_PATH = "poster_path";
-    final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";
+
+    final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";    // base URL for the images, to be used by Picasso
 
     public MovieDetailFragment() {
     }
@@ -57,7 +60,7 @@ public class MovieDetailFragment extends Fragment {
                 year_textView.setText(movieDetailsJSON.getString(TAG_RELEASE_DATE));
                 ratings_textView.setText(movieDetailsJSON.getString(TAG_RATINGS));
 
-                // use Picasso again to load up the Image View
+                // use Picasso to load up the Image View
                 Picasso.with(getContext()).load(IMAGE_BASE_URL + movieDetailsJSON.getString(TAG_POSTER_PATH)).into(poster_imageView);
 
             } catch (JSONException e) {

@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
-    private ArrayList<String> posterPaths;
+    private ArrayList<String> posterPaths;  // this array will contain the paths to posters
     private final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";
 
     public ImageAdapter(Context c, ArrayList<String> imagePaths) {
@@ -49,8 +49,8 @@ public class ImageAdapter extends BaseAdapter {
             // each "w185" image is 185 x 277
             // but this size is too small on a screen
             // so double it
-            imageView.setLayoutParams(new GridView.LayoutParams(400, 600));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setLayoutParams(new GridView.LayoutParams(370, 554));
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
             imageView.setPadding(0, 0, 0, 0);
         }
         else {

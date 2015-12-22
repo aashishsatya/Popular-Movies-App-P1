@@ -32,10 +32,16 @@ import java.util.ArrayList;
  */
 public class MainActivityFragment extends Fragment {
 
-    final String TAG_SORT_ON_POPULARITY = "popularity.desc";
+    final String TAG_SORT_ON_POPULARITY = "popularity.desc";    // the strings for API call
     final String TAG_SORT_ON_RATINGS = "vote_average.desc";
-    ArrayList<String> posterPaths = new ArrayList<String>();
-    JSONArray movieArray = null;
+
+    ArrayList<String> posterPaths = new ArrayList<String>();    // array to hold the paths to images (or image names)
+    // these will be fed to ImageAdapter as a parameter which will be used by Picasso to load the images
+
+    JSONArray movieArray = null;    // array to hold the details of all movies
+    // setOnItemClickListener will send the correct movie details from this array to the MovieDetail activity based on
+    // the position of the image clicked
+
     GridView gridView;
 
     @Override
@@ -65,7 +71,8 @@ public class MainActivityFragment extends Fragment {
                 if (movieArray != null) {
                     // get the movie details
                     try {
-                        String movieDetails = movieArray.getJSONObject(position).toString();
+                        // launch the MovieDetails activity
+                        String movieDetails = movieArray.getJSONObject(position).toString();    // get the corresponding movie details from the array
                         Intent movieDetailsIntent = new Intent(getActivity(), MovieDetail.class);
                         movieDetailsIntent.putExtra(Intent.EXTRA_TEXT, movieDetails);
                         startActivity(movieDetailsIntent);
@@ -82,6 +89,8 @@ public class MainActivityFragment extends Fragment {
     public class FetchMovieTask extends AsyncTask<Void, Void, JSONArray> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+
+        // strings required for building the API call
         final String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
         final String SORT_PARAM = "sort_by";
         final String API_PARAM = "api_key";
@@ -112,6 +121,9 @@ public class MainActivityFragment extends Fragment {
             }
 
             try {
+
+                // code referenced from Udacity's Sunshine app
+
                 // Construct the URL for the MovieDB query
                 // Possible parameters are avaiable at MovieDB's forecast API page, at
                 // http://docs.themoviedb.apiary.io/#reference/discover
@@ -198,12 +210,9 @@ public class MainActivityFragment extends Fragment {
             final String MOVIE_LIST = "results";
 
             JSONObject movieJSON = new JSONObject(movieJSONStr);
+            // movieJSON object has some extra details
+            // but we need just the details of movies, so store them separately:
             movieArray = movieJSON.getJSONArray(MOVIE_LIST);
-
-            /*for (int i = 0; i < movieArray.length(); i++) {
-                JSONObject movieDetails = movieArray.getJSONObject(i);
-                Log.v(LOG_TAG, "Movie Detail: " + movieDetails.toString());
-            }*/
 
             return movieArray;
 
