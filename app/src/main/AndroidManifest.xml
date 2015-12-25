@@ -5,6 +5,10 @@
     <!-- This permission is necessary for Popular Movies App to be allowed to access the internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- These permissions are required to check the internet connectivity -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

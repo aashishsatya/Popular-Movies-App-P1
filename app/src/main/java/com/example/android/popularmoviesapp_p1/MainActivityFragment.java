@@ -1,19 +1,23 @@
 package com.example.android.popularmoviesapp_p1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,13 +38,19 @@ public class MainActivityFragment extends Fragment {
 
     final String TAG_SORT_ON_POPULARITY = "popularity.desc";    // the strings for API call
     final String TAG_SORT_ON_RATINGS = "vote_average.desc";
+    final String TAG_POSTER_PATH = "poster_path";
+    final String MOVIE_ARRAY_KEY = "movieArray";
+    final String POSTER_PATHS_KEY = "posterPaths";
 
-    ArrayList<String> posterPaths = new ArrayList<String>();    // array to hold the paths to images (or image names)
+
+    ArrayList<String> posterPaths = null;    // array to hold the paths to images (or image names)
     // these will be fed to ImageAdapter as a parameter which will be used by Picasso to load the images
 
-    JSONArray movieArray = null;    // array to hold the details of all movies
+    private JSONArray movieArray = null;    // array to hold the details of all movies
     // setOnItemClickListener will send the correct movie details from this array to the MovieDetail activity based on
     // the position of the image clicked
+
+    ArrayList<String> movieArrayStr = null;
 
     GridView gridView;
 
@@ -67,28 +77,54 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (movieArray != null) {
-                    // get the movie details
-                    try {
-                        // launch the MovieDetails activity
-                        String movieDetails = movieArray.getJSONObject(position).toString();    // get the corresponding movie details from the array
-                        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetail.class);
-                        movieDetailsIntent.putExtra(Intent.EXTRA_TEXT, movieDetails);
-                        startActivity(movieDetailsIntent);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                if (movieArrayStr != null) {
+                    // launch the MovieDetails activity
+                    String movieDetails = movieArrayStr.get(position);    // get the corresponding movie details from the array
+                    Intent movieDetailsIntent = new Intent(getActivity(), MovieDetail.class);
+                    movieDetailsIntent.putExtra(Intent.EXTRA_TEXT, movieDetails);
+                    startActivity(movieDetailsIntent);
                 }
             }
         });
 
+        // send poster paths to ImageAdapter as a parameter to set the images up
+
+        if (posterPaths != null) {
+            gridView.setAdapter(new ImageAdapter(getActivity(), posterPaths));
+        }
+
         return rootView;
     }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
+    }
+
+    // this method is called only once for this fragment
     @Override
-    public void onStart() {
-        super.onStart();
-        new FetchMovieTask().execute();
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            // set up the required variables that had been saved earlier
+            movieArrayStr = savedInstanceState.getStringArrayList(MOVIE_ARRAY_KEY);
+            posterPaths = savedInstanceState.getStringArrayList(POSTER_PATHS_KEY);
+        }
+        else {
+            // this is the first run / we don't have the required details
+            // so get them by running a background thread
+
+            // but before that check if we're connected to the internet
+
+            if (isNetworkConnected() == false) {
+                // no internet connection
+                // generate a toast asking the user to connect to internet first
+                Toast.makeText(getActivity(), "Not connected to the Internet", Toast.LENGTH_LONG).show();
+            }
+            else {
+                new FetchMovieTask().execute();
+            }
+        }
     }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, JSONArray> {
@@ -99,7 +135,6 @@ public class MainActivityFragment extends Fragment {
         final String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
         final String SORT_PARAM = "sort_by";
         final String API_PARAM = "api_key";
-        final String TAG_POSTER_PATH = "poster_path";
 
         @Override
         protected JSONArray doInBackground(Void... nothing) {
@@ -113,7 +148,7 @@ public class MainActivityFragment extends Fragment {
             int numMovies = 20;
             String sortingOrder = null;
 
-            // find the sorting parameter 
+            // find the sorting parameter
             // get user's preferred units setting
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String sortingOrderPref = sharedPref.getString(getString(R.string.sort_order_key),
@@ -124,6 +159,7 @@ public class MainActivityFragment extends Fragment {
             else {
                 sortingOrder = TAG_SORT_ON_POPULARITY;
             }
+
 
             try {
 
@@ -170,19 +206,18 @@ public class MainActivityFragment extends Fragment {
                     return null;
                 }
                 movieJSONStr = buffer.toString();
-                // Log.d(LOG_TAG, movieJSONStr);
                 // obtain and return the data
                 try {
-                    JSONArray movieData = getMovieDataFromJSON(movieJSONStr, numMovies);
+                    JSONArray movieData = getMovieDataFromJSON(movieJSONStr);
                     // successfully obtained movie data from JSON string
                     // now return this value
                     return movieData;
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, e.getMessage(), e);
-                    e.printStackTrace();
+                    // can't get movie data from obtained string
+                    // nothing to do
+                    return null;
                 }
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the movie data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -194,11 +229,10 @@ public class MainActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                        Toast.makeText(getActivity(), "Error closing data stream", Toast.LENGTH_LONG).show();
                     }
                 }
             }
-            return null;
         }
 
         /**
@@ -208,7 +242,7 @@ public class MainActivityFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private JSONArray getMovieDataFromJSON(String movieJSONStr, int numMovies)
+        private JSONArray getMovieDataFromJSON(String movieJSONStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -227,23 +261,42 @@ public class MainActivityFragment extends Fragment {
         protected void onPostExecute(JSONArray movieArray) {
             super.onPostExecute(movieArray);
 
+            if (movieArray == null)
+                return; // nothing to do without any data
+
+            // continue processing the array with movie details
+
+            movieArrayStr = new ArrayList<String>();
+            posterPaths = new ArrayList<String>();
+
             // now we need to send the poster paths to the ImageAdapter
             // for it to load images on to the GridView
 
             for (int i = 0; i < movieArray.length(); i++) {
                 try {
-                    posterPaths.add(movieArray.getJSONObject(i).getString(TAG_POSTER_PATH));
+                    JSONObject currentJSONObject = movieArray.getJSONObject(i);
+                    posterPaths.add(currentJSONObject.getString(TAG_POSTER_PATH));
+                    movieArrayStr.add(currentJSONObject.toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    return;
                 }
             }
 
             // now we have all the poster paths ready
             // just send it to ImageAdapter as a parameter
-
-            if (posterPaths != null) {
-                gridView.setAdapter(new ImageAdapter(getActivity(), posterPaths));
-            }
+            gridView.setAdapter(new ImageAdapter(getActivity(), posterPaths));
         }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        // save the two main required arrays
+        outState.putStringArrayList(MOVIE_ARRAY_KEY, movieArrayStr);
+        outState.putStringArrayList(POSTER_PATHS_KEY, posterPaths);
+
+        // always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(outState);
     }
 }

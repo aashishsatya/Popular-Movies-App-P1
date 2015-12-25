@@ -7,16 +7,4 @@
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
-    <!-- the above lines of code have been just commented out (and not deleted) as we may need them in future -->
-
-    <!--<header
-        android:fragment="com.example.android.popularmoviesapp_p1.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_notifications" />
-
-    <header
-        android:fragment="com.example.android.popularmoviesapp_p1.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />-->
-
 </preference-headers>
