@@ -1,87 +1,87 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.android.popularmoviesapp_p1.MovieDetailFragment"
-    tools:showIn="@layout/activity_movie_detail">
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/title_textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/synopsis_textView"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.example.android.popularmoviesapp_p1.MovieDetailFragment"
+        tools:showIn="@layout/activity_movie_detail"
+        android:minHeight="600dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/title_textView"
-        android:layout_above="@+id/synopsis_textView"
-        android:minWidth="600dp"
-        android:minHeight="400dp">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/poster_imageView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/title_textView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:contentDescription="@string/image_poster"
-            android:minHeight="160dp"
-            android:minWidth="240dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true" />
+            android:layout_below="@+id/title_textView"
+            android:layout_above="@+id/synopsis_textView"
+            android:minWidth="600dp"
+            android:minHeight="400dp">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/poster_imageView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:contentDescription="@string/image_poster"
+                android:minHeight="160dp"
+                android:minWidth="240dp"
+                android:layout_alignParentTop="true" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:weightSum="1"
+                android:layout_toRightOf="@+id/poster_imageView"
+                android:layout_toEndOf="@+id/poster_imageView"
+                android:layout_alignBottom="@+id/poster_imageView">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Medium Text"
+                    android:id="@+id/year_textView"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.5" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Medium Text"
+                    android:id="@+id/ratings_textView"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="end"
+                    android:textAlignment="viewEnd" />
+
+            </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/synopsis_textView"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:weightSum="1"
-            android:layout_toRightOf="@+id/poster_imageView"
-            android:layout_toEndOf="@+id/poster_imageView">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
-                android:id="@+id/year_textView"
-                android:layout_gravity="center"
-                android:layout_weight="0.5" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
-                android:id="@+id/ratings_textView"
-                android:layout_weight="0.5"
-                android:layout_gravity="right"
-                android:textAlignment="viewEnd" />
-
-        </LinearLayout>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
