@@ -29,7 +29,8 @@
             android:layout_below="@+id/title_textView"
             android:layout_above="@+id/synopsis_textView"
             android:minWidth="600dp"
-            android:minHeight="400dp">
+            android:minHeight="400dp"
+        android:id="@+id/relativeLayout">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -82,6 +83,15 @@
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
-    </RelativeLayout>
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/review_listview"
+            android:layout_below="@+id/synopsis_textView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
+
+</RelativeLayout>
