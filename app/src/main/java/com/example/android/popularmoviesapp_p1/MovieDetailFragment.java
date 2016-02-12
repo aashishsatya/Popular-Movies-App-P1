@@ -241,7 +241,7 @@ public class MovieDetailFragment extends Fragment {
                 try {
                     JSONObject singleReview = reviewsJSONArray.getJSONObject(i);
                     String singleReviewStr = getFormattedReviewFromJSON(singleReview);
-                    Log.d(LOG_TAG, singleReviewStr);
+                    //Log.d(LOG_TAG, singleReviewStr);
                     reviewsArr.add(singleReviewStr);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -249,7 +249,7 @@ public class MovieDetailFragment extends Fragment {
             }
 
             ArrayAdapter adapter = new ArrayAdapter<String> (getContext(), R.layout.list_item_reviews,
-                    R.id.review_textview, new ArrayList<String>());
+                    R.id.review_textview, reviewsArr);
             review_listView.setAdapter(adapter);
 
         }
