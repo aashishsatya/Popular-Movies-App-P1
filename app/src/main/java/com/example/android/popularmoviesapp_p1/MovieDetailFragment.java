@@ -114,32 +114,6 @@ public class MovieDetailFragment extends Fragment {
         protected void onPreExecute() {
         }
 
-        /*@Override
-        protected JSONArray doInBackground(String... params) {
-            String movieID = params[0];
-            API_URL = API_URL + movieID;
-            restAdapter = new RestAdapter.Builder()
-                    .setEndpoint(API_URL)
-                    .setLogLevel(RestAdapter.LogLevel.FULL)
-                    .setLog(new RestAdapter.Log() {
-                        @Override
-                        public void log(String msg) {
-                            Log.i(LOG_TAG, msg);
-                        }
-                    })
-                    .build();
-            ReviewsAPI reviewsAPI = restAdapter.create(ReviewsAPI.class);
-            JSONObject reviewsJSONObject = reviewsAPI.getMovieReviews(BuildConfig.MOVIE_DB_API_KEY);
-            Log.d(LOG_TAG, reviewsJSONObject.toString());
-            JSONArray reviewsJSONArray = null;
-            try {
-                reviewsJSONArray = reviewsJSONObject.getJSONArray("results");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return reviewsJSONArray;
-        }*/
-
         @Override
         protected JSONArray doInBackground(String... params) {
             // These two need to be declared outside the try/catch
