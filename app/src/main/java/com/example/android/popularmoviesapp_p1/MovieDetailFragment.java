@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,8 +30,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import retrofit.RestAdapter;
-
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -49,6 +48,7 @@ public class MovieDetailFragment extends Fragment {
     final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";    // base URL for the images, to be used by Picasso
 
     ListView review_listView;
+    ListView trailers_listView;
 
     public MovieDetailFragment() {
     }
@@ -79,6 +79,7 @@ public class MovieDetailFragment extends Fragment {
                 TextView year_textView = (TextView) rootView.findViewById(R.id.year_textView);
                 TextView ratings_textView = (TextView) rootView.findViewById(R.id.ratings_textView);
                 review_listView = (ListView) rootView.findViewById(R.id.review_listview);
+                trailers_listView = (ListView) rootView.findViewById(R.id.trailers_listView);
 
                 // load them up
 
@@ -90,6 +91,11 @@ public class MovieDetailFragment extends Fragment {
                 // use Picasso to load up the Image View
                 Picasso.with(getContext()).load(IMAGE_BASE_URL + movieDetailsJSON.getString(TAG_POSTER_PATH)).into(poster_imageView);
 
+                // query and load trailers
+                FetchTrailers newFetchTrailers = new FetchTrailers();
+                newFetchTrailers.execute(movieDetailsJSON.getString(TAG_MOVIE_ID));
+
+                // query and load movie reviews
                 FetchReviews newFetchReviews = new FetchReviews();
                 newFetchReviews.execute(movieDetailsJSON.getString(TAG_MOVIE_ID));
 
@@ -101,8 +107,6 @@ public class MovieDetailFragment extends Fragment {
     }
 
     private class FetchReviews extends AsyncTask<String, Void, JSONArray> {
-
-        RestAdapter restAdapter;
 
         String API_URL = "http://api.themoviedb.org/3/movie/";
         String API_PARAM = "api_key";
@@ -201,11 +205,6 @@ public class MovieDetailFragment extends Fragment {
 
         @Override
         protected void onPostExecute(JSONArray reviewsJSONArray) {
-            /*textView.setText(curators.title + "\n\n");
-            for (Curator.Dataset dataset : curators.dataset) {
-                textView.setText(textView.getText() + dataset.curator_title +
-                        " - " + dataset.curator_tagline + "\n");
-            }*/
 
             // set the text here
 
@@ -239,6 +238,145 @@ public class MovieDetailFragment extends Fragment {
             }
 
             return "Name: " + authorName + "\n" + "Review: " + content + "\n";
+        }
+    }
+
+    private class FetchTrailers extends AsyncTask<String, Void, JSONArray> {
+
+        String API_URL = "http://api.themoviedb.org/3/movie/";
+        String API_PARAM = "api_key";
+        String TAG_RESULTS = "results";
+        String TAG_NAME = "name";
+        String TAG_KEY = "key";
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected JSONArray doInBackground(String... params) {
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String videosJSONStr = null;
+
+            try {
+
+                // code referenced from Udacity's Sunshine app
+
+                // Construct the URL for the MovieDB query
+                // Possible parameters are avaiable at MovieDB's forecast API page, at
+                // http://docs.themoviedb.apiary.io/#reference/discover
+
+                // build the new URL
+
+                Uri builtUri = Uri.parse(API_URL + params[0] + "/videos")
+                        .buildUpon()
+                        .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                // Create the request to MovieDB, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                videosJSONStr = buffer.toString();
+                // obtain and return the data
+                try {
+                    JSONObject reviewsJSONObject = new JSONObject(videosJSONStr);
+                    Log.d(LOG_TAG, reviewsJSONObject.toString());
+                    JSONArray reviewJSONArray = reviewsJSONObject.getJSONArray(TAG_RESULTS);
+                    // successfully obtained movie data from JSON string
+                    // now return this value
+                    return reviewJSONArray;
+                } catch (JSONException e) {
+                    // can't get movie data from obtained string
+                    // nothing to do
+                    return null;
+                }
+            } catch (IOException e) {
+                // If the code didn't successfully get the movie data, there's no point in attemping
+                // to parse it.
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Toast.makeText(getActivity(), "Error closing data stream", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final JSONArray reviewsJSONArray) {
+
+            // set the text to display here
+
+            final ArrayList<String> videosArr  = new ArrayList<String>();
+
+            for (int i = 0; i < reviewsJSONArray.length(); i++) {
+                try {
+                    JSONObject singleVideo = reviewsJSONArray.getJSONObject(i);
+                    String singleVideoString = singleVideo.getString(TAG_NAME);
+                    //Log.d(LOG_TAG, singleVideoString);
+                    videosArr.add(singleVideoString);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // reusing the layout and TextViews here
+            ArrayAdapter adapter = new ArrayAdapter<String> (getContext(), R.layout.list_item_reviews,
+                    R.id.review_textview, videosArr);
+            trailers_listView.setAdapter(adapter);
+            trailers_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // get the URL of the youtube video and pass as Intent
+                    if (videosArr.size() != 0) {
+                        // launch the YouTube video
+                        try {
+                            JSONObject requiredVideoJSONObject = reviewsJSONArray.getJSONObject(position);
+                            String trailerKey = requiredVideoJSONObject.getString(TAG_KEY);
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerKey)));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
         }
     }
 }
