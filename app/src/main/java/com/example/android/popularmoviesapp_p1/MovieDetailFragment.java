@@ -1,9 +1,11 @@
 package com.example.android.popularmoviesapp_p1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,12 +46,24 @@ public class MovieDetailFragment extends Fragment {
     final String TAG_SYNOPSIS = "overview";
     final String TAG_POSTER_PATH = "poster_path";
     final String TAG_MOVIE_ID = "id";
+    final String FAV_MOVIE_KEY = "favorite_movies";
     String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
     final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";    // base URL for the images, to be used by Picasso
 
     ListView review_listView;
     ListView trailers_listView;
+
+    JSONObject movieDetailsJSON;
+    int currentMovieIndexInArr = -1;
+    SharedPreferences sharedPref;
+
+    // variables for showing the 'Starred' status
+    boolean isCurrentMovieFav = false;
+    ImageButton favoritesButton;
+    String currentFavs;
+    JSONArray currentFavsJSONArr;
+
 
     public MovieDetailFragment() {
     }
@@ -64,12 +79,7 @@ public class MovieDetailFragment extends Fragment {
             try {
 
                 // convert the String extra back into JSON
-                JSONObject movieDetailsJSON = new JSONObject(movieDetails);
-
-                // this is for debugging
-                // TODO: remove this code later
-
-                Log.d(LOG_TAG + "movieID:", movieDetailsJSON.getString(TAG_MOVIE_ID));
+                movieDetailsJSON = new JSONObject(movieDetails);
 
                 // get all the required views
 
@@ -80,6 +90,7 @@ public class MovieDetailFragment extends Fragment {
                 TextView ratings_textView = (TextView) rootView.findViewById(R.id.ratings_textView);
                 review_listView = (ListView) rootView.findViewById(R.id.review_listview);
                 trailers_listView = (ListView) rootView.findViewById(R.id.trailers_listView);
+                favoritesButton = (ImageButton) rootView.findViewById(R.id.fav_imageButton);
 
                 // load them up
 
@@ -87,6 +98,45 @@ public class MovieDetailFragment extends Fragment {
                 synopsis_textView.setText(movieDetailsJSON.getString(TAG_SYNOPSIS));
                 year_textView.setText("Release Date: " + movieDetailsJSON.getString(TAG_RELEASE_DATE));
                 ratings_textView.setText("Ratings: " + movieDetailsJSON.getString(TAG_RATINGS));
+
+                // load the correct icon for 'Starred'
+
+                // check if the movie has been starred by the user
+
+                isCurrentMovieFav = false;
+
+                // get the list of movies starred first
+
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                currentFavs = sharedPref.getString(FAV_MOVIE_KEY, "");   // all the current favourites stored
+                if (currentFavs.equals("")) {
+                    currentFavsJSONArr = new JSONArray();
+                    Log.d(LOG_TAG, "Got empty stored pref");
+                }
+                else {
+                    currentFavsJSONArr = new JSONArray(currentFavs);
+                    Log.d(LOG_TAG + "retr:", currentFavsJSONArr.toString());
+                }
+                for (int i = 0; i < currentFavsJSONArr.length(); i++) {
+                    JSONObject favMovie = currentFavsJSONArr.getJSONObject(i);
+                    if (favMovie.getString(TAG_MOVIE_ID).equals(movieDetailsJSON.getString(TAG_MOVIE_ID))) {
+                        // current movie has been favorited
+                        isCurrentMovieFav = true;
+                        currentMovieIndexInArr = i;
+                        break;
+                    }
+                }
+
+                // if the movie is a favorite, use the golden star
+                if (isCurrentMovieFav) {
+                    favoritesButton.setImageResource(R.drawable.star_yes);
+                }
+                // if no, use the grey star
+                else {
+                    favoritesButton.setImageResource(R.drawable.star_no);
+                }
+                // set the ClickListenerItem for the image button
+                favoritesButton.setOnClickListener(listener);
 
                 // use Picasso to load up the Image View
                 Picasso.with(getContext()).load(IMAGE_BASE_URL + movieDetailsJSON.getString(TAG_POSTER_PATH)).into(poster_imageView);
@@ -105,6 +155,55 @@ public class MovieDetailFragment extends Fragment {
         }
         return rootView;
     }
+
+    // define the OnClickListener item for the ImageButton
+
+    ImageButton.OnClickListener listener = new ImageButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // function to change the favorite status
+            // if this function gets called this means the star icon has been clicked
+
+            // check if the movie is already a favourite
+
+            if (isCurrentMovieFav) {
+
+                // means now the movie needs to be de-starred
+
+                JSONArray newFavsJSONArr = new JSONArray();
+
+                // remove it from the list of movies
+                // current movie's index (currentMovieIndexArr) has already been calculated; need not do so again
+                for (int i = 0; i < currentFavsJSONArr.length(); i++) {
+                    if (i != currentMovieIndexInArr) {
+                        // add it to the new list
+                        try {
+                            newFavsJSONArr.put(currentFavsJSONArr.getJSONObject(i));
+                            // unfortunately a simple .remove() cannot be used because our MinSDK is 15
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                // write the result back to the shared preference
+                sharedPref.edit().putString(FAV_MOVIE_KEY, newFavsJSONArr.toString()).apply();
+
+                // de-star
+                favoritesButton.setImageResource(R.drawable.star_no);
+            }
+            else {
+
+                // means we have a new movie to star
+
+                currentFavsJSONArr.put(movieDetailsJSON);
+                // write to file
+                sharedPref.edit().putString(FAV_MOVIE_KEY, currentFavsJSONArr.toString()).apply();
+                // change icon to starred
+                favoritesButton.setImageResource(R.drawable.star_yes);
+            }
+        }
+    };
 
     private class FetchReviews extends AsyncTask<String, Void, JSONArray> {
 
