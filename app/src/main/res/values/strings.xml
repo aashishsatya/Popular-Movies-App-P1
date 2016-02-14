@@ -15,13 +15,17 @@
     <string name="sort_order_rating">pref_order_rating</string>
     <string name="sort_order_popularity">pref_order_popularity</string>
     <string name="sort_order_default">pref_order_popularity</string>
+    <string name="favorites">favorites</string>
+
     <string-array name="sort_order_titles">
         <item>Most Popular</item>
         <item>Highest Rated</item>
+        <item>Favorites</item>
     </string-array>
     <string-array name="sort_order_values">
         <item>@string/sort_order_popularity</item>
         <item>@string/sort_order_rating</item>
+        <item>@string/favorites</item>
     </string-array>
 
 </resources>

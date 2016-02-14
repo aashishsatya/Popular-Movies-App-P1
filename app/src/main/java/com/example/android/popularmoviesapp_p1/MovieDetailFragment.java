@@ -191,6 +191,8 @@ public class MovieDetailFragment extends Fragment {
 
                 // de-star
                 favoritesButton.setImageResource(R.drawable.star_no);
+                // set isCurrentMovieFav to false
+                isCurrentMovieFav = false;
             }
             else {
 
@@ -201,6 +203,7 @@ public class MovieDetailFragment extends Fragment {
                 sharedPref.edit().putString(FAV_MOVIE_KEY, currentFavsJSONArr.toString()).apply();
                 // change icon to starred
                 favoritesButton.setImageResource(R.drawable.star_yes);
+                isCurrentMovieFav = true;
             }
         }
     };

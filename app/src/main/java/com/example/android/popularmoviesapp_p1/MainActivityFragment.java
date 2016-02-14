@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,7 @@ public class MainActivityFragment extends Fragment {
     final String TAG_POSTER_PATH = "poster_path";
     final String MOVIE_ARRAY_KEY = "movieArray";
     final String POSTER_PATHS_KEY = "posterPaths";
+    final String FAV_MOVIE_KEY = "favorite_movies";
 
     // String MOVIE_DB_API_KEY = "00939a440f3f4ee57907262ea0e009e0";
 
@@ -157,8 +159,28 @@ public class MainActivityFragment extends Fragment {
             if (sortingOrderPref.equals(getString(R.string.sort_order_rating))) {
                 sortingOrder = TAG_SORT_ON_RATINGS;
             }
-            else {
+            else if (sortingOrderPref.equals(getString(R.string.sort_order_popularity))){
                 sortingOrder = TAG_SORT_ON_POPULARITY;
+            }
+            else {
+                JSONArray currentFavsJSONArr;
+                // favourites view was selected
+                // this is actually the easiest, just read the JSONArray and return
+                String currentFavs = sharedPref.getString(FAV_MOVIE_KEY, "");   // all the current favourites stored
+                if (currentFavs.equals("")) {
+                     currentFavsJSONArr = new JSONArray();
+                     Log.d(LOG_TAG, "Got empty stored pref");
+                     return currentFavsJSONArr;
+                }
+                else {
+                    try {
+                        currentFavsJSONArr = new JSONArray(currentFavs);
+                        Log.d(LOG_TAG + "retr:", currentFavsJSONArr.toString());
+                        return currentFavsJSONArr;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
 
