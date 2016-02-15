@@ -14,6 +14,12 @@ public class MovieDetail extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.scrollojt, new MovieDetailFragment())
+                    .commit();
+        }
     }
 
 }

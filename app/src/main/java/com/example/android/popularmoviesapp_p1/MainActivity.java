@@ -3,18 +3,33 @@ package com.example.android.popularmoviesapp_p1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
+    private boolean mTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+
+        if(findViewById(R.id.scrollojt) != null) {
+            // we have a two-pane window
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.scrollojt, new MovieDetailFragment(), DETAIL_FRAGMENT_TAG)
+                        .commit();
+            }
+            else {
+                mTwoPane = false;
+            }
+        }
     }
 
     @Override
