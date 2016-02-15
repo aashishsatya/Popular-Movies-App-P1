@@ -27,5 +27,9 @@
         <item>@string/sort_order_rating</item>
         <item>@string/favorites</item>
     </string-array>
+    <string name="title_film_list">Films</string>
+    <string name="title_film_detail">Film Detail</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 
 </resources>
