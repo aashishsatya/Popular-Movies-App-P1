@@ -47,6 +47,7 @@ public class MovieDetailFragment extends Fragment {
     final String TAG_POSTER_PATH = "poster_path";
     final String TAG_MOVIE_ID = "id";
     final String FAV_MOVIE_KEY = "favorite_movies";
+    String MOVIE_DETAILS_KEY = "movie_details_key";
     String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
     final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185/";    // base URL for the images, to be used by Picasso
@@ -68,14 +69,23 @@ public class MovieDetailFragment extends Fragment {
     public MovieDetailFragment() {
     }
 
+    /*void onPreferenceChanged(String movieDetails) {
+
+    }*/
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        String movieDetails = "";
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            movieDetails = arguments.getString(MOVIE_DETAILS_KEY);
+        }
         View rootView =  inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        Intent oldIntent = getActivity().getIntent();
-        if (oldIntent != null && oldIntent.hasExtra(Intent.EXTRA_TEXT)) {
-            String movieDetails = oldIntent.getStringExtra(Intent.EXTRA_TEXT);
+        if (arguments != null) {
             try {
 
                 // convert the String extra back into JSON

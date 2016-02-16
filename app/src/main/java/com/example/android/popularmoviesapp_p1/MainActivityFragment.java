@@ -1,7 +1,6 @@
 package com.example.android.popularmoviesapp_p1;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -43,6 +42,8 @@ public class MainActivityFragment extends Fragment {
     final String POSTER_PATHS_KEY = "posterPaths";
     final String FAV_MOVIE_KEY = "favorite_movies";
 
+    int mPosition = 0;
+
     // String MOVIE_DB_API_KEY = "00939a440f3f4ee57907262ea0e009e0";
 
 
@@ -66,6 +67,11 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public interface Callback {
+        /* Callback for when an item has been selected */
+        public void onItemSelected(String movieDetails);
+    }
+
     public MainActivityFragment() {
     }
 
@@ -81,11 +87,10 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (movieArrayStr != null) {
-                    // launch the MovieDetails activity
                     String movieDetails = movieArrayStr.get(position);    // get the corresponding movie details from the array
-                    Intent movieDetailsIntent = new Intent(getActivity(), MovieDetail.class);
-                    movieDetailsIntent.putExtra(Intent.EXTRA_TEXT, movieDetails);
-                    startActivity(movieDetailsIntent);
+                    Toast.makeText(getContext(), "Fragment has detected selection", Toast.LENGTH_SHORT).show();
+                    ((Callback) getActivity()).onItemSelected(movieDetails);
+                    mPosition = position;
                 }
             }
         });
@@ -127,6 +132,17 @@ public class MainActivityFragment extends Fragment {
             else {
                 new FetchMovieTask().execute();
             }
+        }
+    }
+
+    void onPreferenceChanged() {
+        if (isNetworkConnected() == false) {
+            // no internet connection
+            // generate a toast asking the user to connect to internet first
+            Toast.makeText(getActivity(), "Not connected to the Internet", Toast.LENGTH_LONG).show();
+        }
+        else {
+            new FetchMovieTask().execute();
         }
     }
 

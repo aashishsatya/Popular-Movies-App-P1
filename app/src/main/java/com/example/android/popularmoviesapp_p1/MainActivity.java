@@ -1,15 +1,20 @@
 package com.example.android.popularmoviesapp_p1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback{
 
     private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
+    private static final String MOVIE_DETAILS_KEY = "movie_details_key";
     private boolean mTwoPane;
+    private String sortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,18 +22,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
-
-        if(findViewById(R.id.scrollojt) != null) {
-            // we have a two-pane window
-            mTwoPane = true;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sortOrder = sharedPref.getString(getString(R.string.sort_order_key),
+                getString(R.string.sort_order_default));
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;// show detail veiew in this activity by adding or replacing the detail fragment using a fragment transaction
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.scrollojt, new MovieDetailFragment(), DETAIL_FRAGMENT_TAG)
+                        .replace(R.id.movie_detail_container, new MovieDetailFragment(), DETAIL_FRAGMENT_TAG)
                         .commit();
             }
-            else {
-                mTwoPane = false;
-            }
+        }
+        else {
+            mTwoPane = false;
         }
     }
 
@@ -55,5 +61,47 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // update movie selection in our second pane using the fragment manager
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String newSortOrder = sharedPref.getString(getString(R.string.sort_order_key),
+                getString(R.string.sort_order_default));
+        if (newSortOrder != null && !newSortOrder.equals(sortOrder)) {
+            MainActivityFragment mainActivityFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if (mainActivityFragment != null) {
+                mainActivityFragment.onPreferenceChanged();
+            }
+            MovieDetailFragment movieDetailFragment = (MovieDetailFragment) getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
+            /*if (movieDetailFragment != null) {
+                movieDetailFragment.onPreferenceChanged();
+            }*/
+            sortOrder = newSortOrder;
+        }
+    }
+
+    @Override
+    public void onItemSelected(String movieDetails) {
+        if (mTwoPane) {
+            Toast.makeText(MainActivity.this, "In two pane UI", Toast.LENGTH_SHORT).show();
+            // add or replace detail fragment using a
+            // fragment transaction.
+            Bundle args = new Bundle();
+            args.putString(MOVIE_DETAILS_KEY, movieDetails);
+
+            MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
+            movieDetailFragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, movieDetailFragment, DETAIL_FRAGMENT_TAG).commit();
+        }
+        else {
+            // launch activity as earlier
+            Intent movieDetailsIntent = new Intent(this, MovieDetail.class).putExtra(MOVIE_DETAILS_KEY, movieDetails);
+            startActivity(movieDetailsIntent);
+        }
     }
 }
