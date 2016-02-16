@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,13 +21,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sortOrder = sharedPref.getString(getString(R.string.sort_order_key),
                 getString(R.string.sort_order_default));
         if (findViewById(R.id.movie_detail_container) != null) {
-            mTwoPane = true;// show detail veiew in this activity by adding or replacing the detail fragment using a fragment transaction
+            mTwoPane = true;// show detail view in this activity by adding or replacing the detail fragment using a fragment transaction
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.movie_detail_container, new MovieDetailFragment(), DETAIL_FRAGMENT_TAG)

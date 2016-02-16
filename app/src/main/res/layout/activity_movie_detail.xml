@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/movie_detail_container"
-    
+
     tools:context="com.example.android.popularmoviesapp_p1.MovieDetail">
 
     <android.support.design.widget.AppBarLayout
@@ -22,7 +22,5 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_movie_detail" />
 
 </android.support.design.widget.CoordinatorLayout>

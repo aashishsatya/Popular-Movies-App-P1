@@ -83,7 +83,7 @@ public class MovieDetailFragment extends Fragment {
         if (arguments != null) {
             movieDetails = arguments.getString(MOVIE_DETAILS_KEY);
         }
-        View rootView =  inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        View rootView =  inflater.inflate(R.layout.content_movie_detail, container, false);
 
         if (arguments != null) {
             try {
